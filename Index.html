@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>¿Aceptas?</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    font-family: Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    color:white;
+    text-align:center;
+    transition:0.5s;
+}
+
+.blur{
+    filter: blur(8px);
+}
+
+.container{
+    background: rgba(0,0,0,0.6);
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    position:relative;
+    z-index:10;
+}
+
+button{
+    padding:15px 30px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin:10px;
+}
+
+#yes{ background:#4CAF50; color:white; }
+#no{ background:#f44336; color:white; position:absolute; }
+
+/* Corazones flotando */
+.heart{
+    position:absolute;
+    color:white;
+    font-size:20px;
+    animation: floatUp 6s linear infinite;
+    opacity:0.8;
+}
+
+@keyframes floatUp{
+    from{ transform: translateY(0); opacity:0.8; }
+    to{ transform: translateY(-100vh); opacity:0; }
+}
+
+/* Explosión */
+.explosion{
+    position:fixed;
+    font-size:30px;
+    animation: explode 1s ease-out forwards;
+}
+
+@keyframes explode{
+    from{ transform: translate(-50%,-50%) scale(0); opacity:1; }
+    to{ transform: translate(var(--x), var(--y)) scale(1.5); opacity:0; }
+}
+
+/* Imagen sorpresa */
+.sorpresa{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%) scale(0);
+    max-width:90%;
+    max-height:90vh;
+    width:auto;
+    height:auto;
+    border-radius:20px;
+    box-shadow:0 0 40px rgba(0,0,0,0.8);
+    z-index:1000;
+    transition:0.6s;
+    object-fit:contain;
+}
+
+.mensaje{
+    position:fixed;
+    top:15%;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:28px;
+    font-weight:bold;
+    z-index:1100;
+    text-shadow:0 0 10px black;
+    opacity:0;
+    transition:1s;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="contenido">
+    <h1>Hoy Lily tiene algo para ti ¿Aceptas? 💕</h1>
+    <button id="yes" onclick="aceptar()">Sí</button>
+    <button id="no">No</button>
+</div>
+
+<audio id="musica" src="Han.mp3"></audio>
+
+<script>
+const noBtn = document.getElementById("no");
+
+/* Botón NO huye */
+document.addEventListener("mousemove", function(e){
+    const rect = noBtn.getBoundingClientRect();
+    const dx = Math.abs(e.clientX - (rect.left + rect.width/2));
+    const dy = Math.abs(e.clientY - (rect.top + rect.height/2));
+    if(dx < 10 && dy < 10){
+        const maxX = Math.max(0, window.innerWidth - rect.width);
+        const maxY = Math.max(0, window.innerHeight - rect.height);
+        noBtn.style.left = Math.random() * maxX+"px";
+        noBtn.style.top = Math.random() * maxY+"px";
+    }
+});
+
+/* Corazones flotando constantes */
+function crearCorazon(){
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.innerHTML = "❤";
+    heart.style.left = Math.random()*100+"vw";
+    heart.style.fontSize = (Math.random()*20+15)+"px";
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),6000);
+}
+setInterval(crearCorazon,300);
+
+/* ACEPTAR */
+function aceptar(){
+
+    // Desenfocar fondo
+    document.getElementById("contenido").classList.add("blur");
+
+    // Reproducir música
+    document.getElementById("musica").play();
+
+    // Explosión de corazones
+    for(let i=0;i<40;i++){
+        const heart = document.createElement("div");
+        heart.classList.add("explosion");
+        heart.innerHTML="❤";
+        heart.style.left="50%";
+        heart.style.top="50%";
+
+        const angle = Math.random()*2*Math.PI;
+        const distance = Math.random()*300+100;
+        const x = Math.cos(angle)*distance+"px";
+        const y = Math.sin(angle)*distance+"px";
+
+        heart.style.setProperty('--x', x);
+        heart.style.setProperty('--y', y);
+
+        document.body.appendChild(heart);
+        setTimeout(()=>heart.remove(),1000);
+    }
+
+    // Mostrar imagen
+    const img = document.createElement("img");
+    img.src="sorpresa.jpeg";
+    img.classList.add("sorpresa");
+    document.body.appendChild(img);
+
+    setTimeout(()=>{
+        img.style.transform="translate(-50%,-50%) scale(1)";
+    },200);
+
+    // Mensaje encima
+    const mensaje = document.createElement("div");
+    mensaje.classList.add("mensaje");
+    mensaje.innerText="💖 FELIZ DÍA DE LA AMISTAD ASTRID, TE QUIERO MUCHO 💖";
+    document.body.appendChild(mensaje);
+
+    setTimeout(()=>{
+        mensaje.style.opacity="1";
+    },500);
+}
+</script>
+
+</body>
+</html>
